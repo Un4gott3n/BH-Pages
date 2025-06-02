@@ -14,12 +14,14 @@ public class SessionHandler
 {
     private static final String FILE_NAME = "player_notes.json";
     private final File notesFile;
-    private final Gson gson = new Gson();
+    private final Gson gson;
     private Map<String, String> playerNotes = new HashMap<>();
 
     @Inject
-    public SessionHandler()
+    public SessionHandler(Gson gson)
     {
+        this.gson = gson;
+
         File pluginDir = new File(RuneLite.RUNELITE_DIR, "bhpages");
         if (!pluginDir.exists())
         {
