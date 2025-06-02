@@ -93,7 +93,6 @@ public class BHP_Plugin extends Plugin {
 			if (match.matches())
 			{
 				lookupPlayerName(match.group(1));
-				chatGameMessage("OPP NAME: " + match.group(1));//is players name in group(1));
 			}
 		}
 	}
