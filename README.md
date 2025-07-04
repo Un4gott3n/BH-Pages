@@ -3,6 +3,7 @@ Keep track of your opponents in Bounty Hunter.
 
 Features:
 
++ Name Autocompletion
 + Automatic activation when target is assigned
 + Notepad for keeping track of opponent behaviors / traits (vw safer, said ty/sit etc..)
 + Combat Level & Total Level listed

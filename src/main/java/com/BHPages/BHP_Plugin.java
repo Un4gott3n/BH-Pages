@@ -79,7 +79,9 @@ public class BHP_Plugin extends Plugin {
 	protected void shutDown() throws Exception {
 
 		sessionHandler.saveNotes();
+		BHPpanel.shutdown();
 		clientToolbar.removeNavigation(navButton);
+
 	}
 
 

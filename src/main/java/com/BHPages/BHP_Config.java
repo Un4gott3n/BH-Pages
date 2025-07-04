@@ -18,4 +18,15 @@ public interface BHP_Config extends Config
 		return true;
 	}
 
+	@ConfigItem(
+			position = 2,
+			keyName = "autocomplete",
+			name = "Autocomplete",
+			description = "Predict names when typing a name to lookup."
+	)
+	default boolean autocomplete()
+	{
+		return true;
+	}
+
 }

@@ -18,6 +18,7 @@ import net.runelite.client.hiscore.*;
 import static net.runelite.api.SpriteID.TAB_COMBAT;
 import static net.runelite.client.hiscore.HiscoreSkill.*;
 
+
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.PluginPanel;
@@ -27,6 +28,7 @@ import net.runelite.client.util.ImageUtil;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.List;
@@ -42,14 +44,17 @@ public class BHP_Panel extends PluginPanel
 
     private final BHP_Plugin BHPplugin;
     private final BHP_Config BHPconfig;
+    private final NameAutocompleter nameAutocompleter;
     private final HiscoreClient hiscoreClient;
     private final SessionHandler sessionHandler;
+    //group to hold all the skill levels & cmb level
+    private final SpriteManager spriteManager;
 
     //panel assets
     private final JPanel BHP_Panel = new JPanel(new GridBagLayout());
     private final IconTextField opp_nameText;
     private final JButton opp_search_button;
-    private final JButton opp_save_button;
+    //private final JButton opp_save_button;
     private final JTextArea notesEditor;
     private final JPanel totalPanel;
     private final JPanel statsPanel;
@@ -62,8 +67,8 @@ public class BHP_Panel extends PluginPanel
     //Runescape character usernames are limited to 12 chars
     int MAX_USERNAME_LENGTH = 12;
 
-    //group to hold all the skill levels & cmb level
-    private final SpriteManager spriteManager;
+    //Making string scope bigger for cleaner code
+    String autosaveMessage = "Click outside of the textbox to trigger AutoSave for your target notes!";
 
     // Not an enummap because we need null keys for combat
     private final Map<HiscoreSkill, JLabel> skillLabels = new HashMap<>();
@@ -87,12 +92,13 @@ public class BHP_Panel extends PluginPanel
     private boolean loading = false;
 
     @Inject
-    BHP_Panel(Client client, BHP_Plugin plugin, BHP_Config config, SessionHandler sessionHandler, SpriteManager spriteManager, HiscoreClient hiscoreClient)  //BHP_Panel(Client client, BHP_Plugin plugin, BHP_Config config, SpriteManager spriteManager, HiscoreClient hiscoreClient)
+    BHP_Panel(Client client, BHP_Plugin plugin, BHP_Config config, NameAutocompleter nameAutocompleter, HiscoreClient hiscoreClient, SessionHandler sessionHandler, SpriteManager spriteManager )  //BHP_Panel(Client client, BHP_Plugin plugin, BHP_Config config, SpriteManager spriteManager, HiscoreClient hiscoreClient)
     {
         this.BHPplugin = plugin;
         this.BHPconfig = config;
-        this.sessionHandler = sessionHandler;
+        this.nameAutocompleter = nameAutocompleter;
         this.hiscoreClient = hiscoreClient;
+        this.sessionHandler = sessionHandler;
         this.spriteManager = spriteManager;
 
         setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
@@ -128,8 +134,6 @@ public class BHP_Panel extends PluginPanel
         c.gridy = 0;
         add(opp_nameText, c);
 
-        c.insets = new Insets(0, 0, 10, 10);
-
         //search button to display players
         opp_search_button = new JButton("Search");
         opp_search_button.addActionListener(evt ->
@@ -138,37 +142,14 @@ public class BHP_Panel extends PluginPanel
             lookup(searchName);
         });
         c.weightx = 1;
-        c.gridwidth = 1;
+        c.gridwidth = 2;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 1;
         add(opp_search_button, c);
 
-        c.insets = new Insets(0, 0, 10, 0);
-
-        notesEditor = new JTextArea();  // need to define the note editor area before the save button to grab text
-
-        //save button to store player data
-        opp_save_button = new JButton("Save");
-        opp_save_button.addActionListener( e ->
-        {
-            String note = notesEditor.getText();
-            String playerName = opp_nameText.getText();
-
-            if(!note.isEmpty() && !playerName.isEmpty())
-            {
-                sessionHandler.updateNote(playerName, note);
-                postSaveMsg("[+]BH Pages: Note for " + playerName + " has been updated.");
-            }
-        });
-        c.weightx = 1;
-        c.gridwidth = 1;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 1;
-        c.gridy = 1;
-        add(opp_save_button, c);
-
-        //note area for player notes - see note above for declaration.
+        notesEditor = new JTextArea();
+        notesEditor.setForeground(Color.WHITE);
         notesEditor.setBackground(ColorScheme.DARKER_GRAY_COLOR);
         notesEditor.setLineWrap(true);
         notesEditor.setWrapStyleWord(true);
@@ -179,7 +160,12 @@ public class BHP_Panel extends PluginPanel
             @Override
             public void focusGained(FocusEvent e)
             {
-
+                String note = notesEditor.getText();
+                if(note.equals(autosaveMessage))
+                {
+                    notesEditor.setForeground(Color.WHITE);
+                    notesEditor.setText("");
+                }
             }
 
             @Override
@@ -187,6 +173,9 @@ public class BHP_Panel extends PluginPanel
             {
                 String note = notesEditor.getText();
                 String playerName = opp_nameText.getText();
+
+                //ensure we aren't saving this message as the note
+                if(note.equals(autosaveMessage)) return;
 
                 if(!note.isEmpty() && !playerName.isEmpty())
                 {
@@ -294,15 +283,30 @@ public class BHP_Panel extends PluginPanel
         c.gridy = 6;
         add(minigamePanel, c);
 
+        addInputKeyListener(nameAutocompleter);
+
     }
 
+    void shutdown()
+    {
+        removeInputKeyListener(nameAutocompleter);
+    }
 //asset functions
 
     public void lookup(String username)
     {
         opp_nameText.setText(username);
         String note = sessionHandler.getNoteForPlayer(username);
-        notesEditor.setText(note);
+        if(note.isEmpty())
+        {
+            notesEditor.setForeground(Color.GRAY);
+            notesEditor.setText(autosaveMessage);
+        }
+        else
+        {
+            notesEditor.setForeground(Color.WHITE);
+            notesEditor.setText(note);
+        }
         lookup();
     }
 
@@ -356,7 +360,6 @@ public class BHP_Panel extends PluginPanel
                     {
                         if (ex != null)
                         {
-                            //not save message but you need to tell users if error.
                             postSaveMsg("Error fetching Hiscore data " + ex.getMessage());
                         }
 
@@ -381,8 +384,7 @@ public class BHP_Panel extends PluginPanel
         assert SwingUtilities.isEventDispatchThread();
         repaint();
 
-        //to be added later (v2?) ---v
-        //nameAutocompleter.addToSearchHistory(result.getPlayer().toLowerCase());
+        nameAutocompleter.addToSearchHistory(result.getPlayer().toLowerCase());
 
         for (Map.Entry<HiscoreSkill, JLabel> entry : skillLabels.entrySet())
         {
@@ -474,6 +476,16 @@ public class BHP_Panel extends PluginPanel
         skillPanel.add(label);
 
         return skillPanel;
+    }
+
+    void addInputKeyListener(KeyListener l)
+    {
+        this.opp_nameText.addKeyListener(l);
+    }
+
+    void removeInputKeyListener(KeyListener l)
+    {
+        this.opp_nameText.removeKeyListener(l);
     }
 
     private String detailsHtml(HiscoreResult result, HiscoreSkill skill)
