@@ -54,7 +54,6 @@ public class BHP_Panel extends PluginPanel
     private final JPanel BHP_Panel = new JPanel(new GridBagLayout());
     private final IconTextField opp_nameText;
     private final JButton opp_search_button;
-    //private final JButton opp_save_button;
     private final JTextArea notesEditor;
     private final JPanel totalPanel;
     private final JPanel statsPanel;
@@ -295,8 +294,9 @@ public class BHP_Panel extends PluginPanel
 
     public void lookup(String username)
     {
-        opp_nameText.setText(username);
-        String note = sessionHandler.getNoteForPlayer(username);
+        opp_nameText.setText(username); //set the username in cases where playername is from BH chat message
+        String clean = sanitize(username); //sanitize bad characters from the name before note search
+        String note = sessionHandler.getNoteForPlayer(clean);
         if(note.isEmpty())
         {
             notesEditor.setForeground(Color.GRAY);
@@ -675,7 +675,8 @@ public class BHP_Panel extends PluginPanel
 
     private static String sanitize(String lookup)
     {
-        return lookup.replace('\u00A0', ' ');
+        return lookup
+                .replace('\u00A0', ' ');
     }
 
     @VisibleForTesting
