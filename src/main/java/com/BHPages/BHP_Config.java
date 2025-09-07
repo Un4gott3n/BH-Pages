@@ -29,4 +29,26 @@ public interface BHP_Config extends Config
 		return true;
 	}
 
+	@ConfigItem(
+			position = 3,
+			keyName = "playerOption",
+			name = "Player lookup option",
+			description = "Add BH Lookup option to players."
+	)
+	default boolean playerOption()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+			position = 4,
+			keyName = "bossPanel",
+			name = "Show boss kc on lookups",
+			description = "Add the boss kc panel below LMS/BH kc"
+	)
+	default boolean bossPanel()
+	{
+		return false;
+	}
+
 }

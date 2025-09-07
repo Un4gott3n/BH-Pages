@@ -23,4 +23,8 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-Credits to HiScores for some of the code within! (Github: https://github.com/runelite/runelite/tree/master/runelite-client/src/main/java/net/runelite/client/plugins/hiscore)
+Credits to below plugins for some of the code within!
+HiScores - (Github: https://github.com/runelite/runelite/tree/master/runelite-client/src/main/java/net/runelite/client/plugins/hiscore)
+Grand Exchange - (Github: https://github.com/runelite/runelite/tree/master/runelite-client/src/main/java/net/runelite/client/plugins/grandexchange)
+Quest Helper - (Github: https://github.com/Zoinkwiz/quest-helper)
+Tile Packs - (Github: https://github.com/TrevorMDev/tile-packs)

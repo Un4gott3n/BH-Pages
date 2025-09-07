@@ -124,7 +124,7 @@ public class SessionHandler
         return input
                 .replace('\uFFFD', ' ')             // Replace the replacement character with a space
                 .replace('\u00A0', ' ')             // Replace non-breaking spaces with regular space
-                .replaceAll("[^A-Za-z0-9 ]", "")     // Keep A-Z, a-z, 0-9, and spaces only
+                .replaceAll("[^-A-Za-z0-9_ ]", "")     // Keep "-" char, A-Z, a-z, 0-9, underscore and spaces only
                 .replaceAll("\\s{2,}", " ")          // Collapse multiple spaces into a single space
                 .trim();
     }
@@ -138,7 +138,8 @@ public class SessionHandler
 
         return note
                 .replace('\u00A0', ' ')   // Replace non-breaking space
-                .replaceAll("\\p{C}", "") // Remove control characters
+                .replaceAll("[\\p{C}&&[^\\n\\t]]", "") // Remove control characters
+                //.replaceAll("\\p{C}", "") // Remove control characters
                 .trim();
     }
 

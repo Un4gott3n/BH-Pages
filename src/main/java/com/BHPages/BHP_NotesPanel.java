@@ -21,7 +21,6 @@ import static net.runelite.client.hiscore.HiscoreSkill.*;
 
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
-import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.ui.components.IconTextField;
 import net.runelite.client.util.ImageUtil;
 
@@ -39,7 +38,7 @@ import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 @Singleton
-public class BHP_Panel extends PluginPanel
+public class BHP_NotesPanel extends JPanel
 {
 
     private final BHP_Plugin BHPplugin;
@@ -51,7 +50,7 @@ public class BHP_Panel extends PluginPanel
     private final SpriteManager spriteManager;
 
     //panel assets
-    private final JPanel BHP_Panel = new JPanel(new GridBagLayout());
+    private final JPanel BHP_NotesPanel = new JPanel(new GridBagLayout());
     private final IconTextField opp_nameText;
     private final JButton opp_search_button;
     private final JTextArea notesEditor;
@@ -62,6 +61,7 @@ public class BHP_Panel extends PluginPanel
     private final JLabel surgeNo;
     private final JLabel surgeYes;
     private final JPanel minigamePanel;
+    private final JPanel bosskcPanel;
 
     //Runescape character usernames are limited to 12 chars
     int MAX_USERNAME_LENGTH = 12;
@@ -84,6 +84,33 @@ public class BHP_Panel extends PluginPanel
             CONSTRUCTION, HUNTER
     );
 
+    //For the boss display panel, same order as hiscore
+    private static final List<HiscoreSkill> BOSSES = ImmutableList.of(
+            ABYSSAL_SIRE, ALCHEMICAL_HYDRA, AMOXLIATL,
+            ARAXXOR, ARTIO, BARROWS_CHESTS,
+            BRYOPHYTA, CALLISTO, CALVARION,
+            CERBERUS, CHAMBERS_OF_XERIC, CHAMBERS_OF_XERIC_CHALLENGE_MODE,
+            CHAOS_ELEMENTAL, CHAOS_FANATIC, COMMANDER_ZILYANA,
+            CORPOREAL_BEAST, CRAZY_ARCHAEOLOGIST, DAGANNOTH_PRIME,
+            DAGANNOTH_REX, DAGANNOTH_SUPREME, DERANGED_ARCHAEOLOGIST,
+            DOOM_OF_MOKHAIOTL, DUKE_SUCELLUS, GENERAL_GRAARDOR,
+            GIANT_MOLE, GROTESQUE_GUARDIANS, HESPORI,
+            KALPHITE_QUEEN, KING_BLACK_DRAGON, KRAKEN,
+            KREEARRA, KRIL_TSUTSAROTH, LUNAR_CHESTS,
+            MIMIC, NEX, NIGHTMARE,
+            PHOSANIS_NIGHTMARE, OBOR, PHANTOM_MUSPAH,
+            SARACHNIS, SCORPIA, SCURRIUS,
+            SKOTIZO, SOL_HEREDIT, SPINDEL,
+            TEMPOROSS, THE_GAUNTLET, THE_CORRUPTED_GAUNTLET,
+            THE_HUEYCOATL, THE_LEVIATHAN, THE_ROYAL_TITANS,
+            THE_WHISPERER, THEATRE_OF_BLOOD, THEATRE_OF_BLOOD_HARD_MODE,
+            THERMONUCLEAR_SMOKE_DEVIL, TOMBS_OF_AMASCUT, TOMBS_OF_AMASCUT_EXPERT,
+            TZKAL_ZUK, TZTOK_JAD, VARDORVIS,
+            VENENATIS, VETION, VORKATH,
+            WINTERTODT, YAMA, ZALCANO,
+            ZULRAH
+    );
+
     /* The currently selected endpoint */
     private HiscoreEndpoint selectedEndPoint;
 
@@ -91,7 +118,13 @@ public class BHP_Panel extends PluginPanel
     private boolean loading = false;
 
     @Inject
-    BHP_Panel(Client client, BHP_Plugin plugin, BHP_Config config, NameAutocompleter nameAutocompleter, HiscoreClient hiscoreClient, SessionHandler sessionHandler, SpriteManager spriteManager )  //BHP_Panel(Client client, BHP_Plugin plugin, BHP_Config config, SpriteManager spriteManager, HiscoreClient hiscoreClient)
+    BHP_NotesPanel(Client client,
+                   BHP_Plugin plugin,
+                   BHP_Config config,
+                   NameAutocompleter nameAutocompleter,
+                   HiscoreClient hiscoreClient,
+                   SessionHandler sessionHandler,
+                   SpriteManager spriteManager )
     {
         this.BHPplugin = plugin;
         this.BHPconfig = config;
@@ -100,7 +133,7 @@ public class BHP_Panel extends PluginPanel
         this.sessionHandler = sessionHandler;
         this.spriteManager = spriteManager;
 
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+        setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
         setBackground(ColorScheme.DARK_GRAY_COLOR);
         setLayout(new GridBagLayout());
 
@@ -111,7 +144,7 @@ public class BHP_Panel extends PluginPanel
         //player name / search bar
         opp_nameText = new IconTextField();
         opp_nameText.setIcon(IconTextField.Icon.SEARCH);
-        opp_nameText.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 20,30));
+        opp_nameText.setPreferredSize(new Dimension(205,30));
         opp_nameText.setBackground(ColorScheme.DARKER_GRAY_COLOR);
         opp_nameText.setHoverBackgroundColor(ColorScheme.DARK_GRAY_HOVER_COLOR);
         opp_nameText.setMinimumSize(new Dimension(0, 30));
@@ -265,7 +298,6 @@ public class BHP_Panel extends PluginPanel
         c.gridy = 5;
         add(surgeYes, c);
 
-
         //panel to display LMS, BH Rouge (nontarget) & BH Hunter (target)
         minigamePanel = new JPanel();
         minigamePanel.setLayout(new GridLayout(0, 3));
@@ -282,8 +314,27 @@ public class BHP_Panel extends PluginPanel
         c.gridy = 6;
         add(minigamePanel, c);
 
-        addInputKeyListener(nameAutocompleter);
+        bosskcPanel = new JPanel();
+        bosskcPanel.setLayout(new GridLayout(0, 3));
+        bosskcPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+        bosskcPanel.setVisible(false); // set to invisible unless config changed.
 
+        // For each boss on the ingame boss panel, create a Label and add it to the UI
+        for (HiscoreSkill skill : BOSSES)
+        {
+            JPanel panel = makeHiscorePanel(skill);
+            bosskcPanel.add(panel);
+        }
+
+        c.weightx = 1;
+        c.gridwidth = 2;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 7;
+        add(bosskcPanel, c);
+
+
+        addInputKeyListener(nameAutocompleter);
     }
 
     void shutdown()
@@ -295,8 +346,9 @@ public class BHP_Panel extends PluginPanel
     public void lookup(String username)
     {
         opp_nameText.setText(username); //set the username in cases where playername is from BH chat message
-        String clean = sanitize(username); //sanitize bad characters from the name before note search
-        String note = sessionHandler.getNoteForPlayer(clean);
+
+        String cleanUsername = sanitize(username); //sanitize bad characters from the name before note search
+        String note = sessionHandler.getNoteForPlayer(cleanUsername);
         if(note.isEmpty())
         {
             notesEditor.setForeground(Color.GRAY);
@@ -312,8 +364,6 @@ public class BHP_Panel extends PluginPanel
 
     private void lookup()
     {
-
-
         final String lookup = sanitize(opp_nameText.getText());
 
         if(Strings.isNullOrEmpty(lookup))
@@ -703,6 +753,18 @@ public class BHP_Panel extends PluginPanel
     private void postSaveMsg(String msg)
     {
         BHPplugin.chatGameMessage(msg);
+    }
+
+    public void showBossPanel(Boolean option)
+    {
+        if(option)
+        {
+            bosskcPanel.setVisible(true);
+        }
+        else
+        {
+            bosskcPanel.setVisible(false);
+        }
     }
 
 }

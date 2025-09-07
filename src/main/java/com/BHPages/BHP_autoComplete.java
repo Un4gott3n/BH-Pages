@@ -69,7 +69,6 @@ class NameAutocompleter implements KeyListener
     private static final int MAX_SEARCH_HISTORY = 25;
 
     private final Client client;
-    //private final HiscoreConfig hiscoreConfig;
     private final BHP_Config BHPconfig;
 
     private final EvictingQueue<String> searchHistory = EvictingQueue.create(MAX_SEARCH_HISTORY);
