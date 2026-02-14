@@ -81,7 +81,7 @@ public class BHP_NotesPanel extends JPanel
             PRAYER, CRAFTING, FIREMAKING,
             MAGIC, FLETCHING, WOODCUTTING,
             RUNECRAFT, SLAYER, FARMING,
-            CONSTRUCTION, HUNTER
+            CONSTRUCTION, HUNTER, SAILING
     );
 
     //For the boss display panel, same order as hiscore

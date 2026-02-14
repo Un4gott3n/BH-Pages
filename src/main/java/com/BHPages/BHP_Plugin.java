@@ -82,7 +82,7 @@ public class BHP_Plugin extends Plugin {
 	//Regex matcher for command in chat
 	private final String gamemessagePlayerOpenString = "You have been assigned a new target: <col=e00a19>";
 	private final String getGamemessagePlayerCloseString = "</col>";
-	private static final Pattern BHPAGES_DEBUG_CMD = Pattern.compile("^!Bhpages\\s+([A-Za-z0-9 ]{1,12})$");
+
 
 	@Provides
 	BHP_Config provideConfig(ConfigManager configManager)
