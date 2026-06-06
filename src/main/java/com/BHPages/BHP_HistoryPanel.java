@@ -42,8 +42,6 @@ class BHP_HistoryPanel extends JPanel
     }
     private final List<historyEntry> historyEntryList = new LinkedList<>();
 
-    private final JScrollPane scrollableContainer;
-
     private static final ImageIcon CHANGELOG_ICON;
     private static final ImageIcon GITHUB_ICON;
     private static final ImageIcon DISCORD_ICON;
@@ -203,59 +201,53 @@ class BHP_HistoryPanel extends JPanel
         historyPanel = new JPanel();
         historyPanel.setLayout(new BoxLayout(historyPanel, BoxLayout.Y_AXIS));
         historyPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
-
-        scrollableContainer = new JScrollPane();
-        scrollableContainer.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollableContainer.getVerticalScrollBar().setUnitIncrement(12);
-        scrollableContainer.setBorder(null);
-        scrollableContainer.setViewportView(historyPanel); //default view
         /* HISTORY PANEL END */
 
         add(buttonPanel, BorderLayout.NORTH);
-        add(scrollableContainer, BorderLayout.CENTER);
+        add(historyPanel, BorderLayout.CENTER);
+
+        add(buttonPanel, BorderLayout.NORTH);
+        //add(scrollableContainer, BorderLayout.CENTER);
     }
 
     private boolean changelogActive()
     {
-        return scrollableContainer.getViewport().getView() == BHPchangelog;
+        return BHPchangelog.getParent() == this;
     }
+
     private boolean donatorActive()
     {
-        return scrollableContainer.getViewport().getView() == BHPdonator;
+        return BHPdonator.getParent() == this;
     }
 
     private void changelogClose()
     {
-        scrollableContainer.setViewportView(historyPanel);
-        historyPanel.setVisible(true);
-
+        remove(BHPchangelog);
+        add(historyPanel, BorderLayout.CENTER);
         repaint();
         revalidate();
     }
 
     private void donatorClose()
     {
-        scrollableContainer.setViewportView(historyPanel);
-        historyPanel.setVisible(true);
-
+        remove(BHPdonator);
+        add(historyPanel, BorderLayout.CENTER);
         repaint();
         revalidate();
     }
 
     private void changelogOpen()
     {
-        scrollableContainer.setViewportView(BHPchangelog);
-        historyPanel.setVisible(false);
-
+        remove(historyPanel);
+        add(BHPchangelog, BorderLayout.CENTER);
         repaint();
         revalidate();
     }
 
     private void donatorOpen()
     {
-        scrollableContainer.setViewportView(BHPdonator);
-        historyPanel.setVisible(false);
-
+        remove(historyPanel);
+        add(BHPdonator, BorderLayout.CENTER);
         repaint();
         revalidate();
     }
@@ -274,6 +266,7 @@ class BHP_HistoryPanel extends JPanel
         for(historyEntry entry : historyEntryList)
         {
             JPanel tile = new historyTilePanel(entry.playerName, entry.timeStamp, this::triggerLookup);
+            //forwardScrollEvents(tile, scrollableContainer); // debug test for above method
             historyPanel.add(tile);
         }
         repaint();
@@ -285,11 +278,5 @@ class BHP_HistoryPanel extends JPanel
     {
         plugin.lookupPlayerName(name, ""); //ensure new entry isn't added to history by passing blank datetime
     }
-
-    public JPanel getHistoryPanel()
-    {
-        return historyPanel;
-    }
-
 
 }

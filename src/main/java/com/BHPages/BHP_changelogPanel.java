@@ -50,6 +50,9 @@ public class BHP_changelogPanel extends JPanel
                         "<li><font color='green'>Added:</font> Right click support \"BH Lookup\" to show note & skills of players.</li>" +
                         "<li><font color='orange'>Fixed:</font> Issue where new lines or tabs were being removed from note data.</li>" +
                         "<li><font color='orange'>Fixed:</font> Issue where names had \"-\" or \"_\" characters removed.</li>" +
+                        "<li><font color='orange'>Fixed:</font> Issue where the history tab wont scroll.</li>" +
+                        "<li><font color='orange'>Fixed:</font> Issue where herblore boost wasn't accounted for in Surge Pot checks.</li>" +
+                        "<li><font color='orange'>Fixed:</font> Issue where boss KC panel doesn't show on client restart when enabled.</li>" +
                         "</ul>" +
                         "</body>" +
                         "</html>";

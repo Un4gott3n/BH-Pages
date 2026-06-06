@@ -77,12 +77,10 @@ public class BHP_Plugin extends Plugin {
 	//regex for opponent player name extraction (onChatMessage)
 	private static final Pattern BOUNTY_PATTERN = Pattern.compile("You have been assigned a new target: <col=[0-9a-f]+>(.*)</col>");
 
-	//to be used in a debug message to trigger plugin.
 	//Openmessage + name + Closemessage
 	//Regex matcher for command in chat
 	private final String gamemessagePlayerOpenString = "You have been assigned a new target: <col=e00a19>";
 	private final String getGamemessagePlayerCloseString = "</col>";
-
 
 	@Provides
 	BHP_Config provideConfig(ConfigManager configManager)
@@ -112,6 +110,11 @@ public class BHP_Plugin extends Plugin {
 		}
 
 		sessionHandler.loadNotes();
+
+		if(config.bossPanel())
+		{
+			BHPNotesPanel.showBossPanel(true);
+		}
 	}
 
 	@Override
@@ -218,7 +221,6 @@ public class BHP_Plugin extends Plugin {
 				lookupPlayerName(match.group(1), date_t);
 			}
 		}
-
 	}
 
 	void lookupPlayerName(String playerName, String datetime)
@@ -245,8 +247,6 @@ public class BHP_Plugin extends Plugin {
 		});
 
 	}
-
-
 
 	private String getCurrentTimestamp()
 	{

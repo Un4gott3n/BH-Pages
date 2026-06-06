@@ -67,11 +67,8 @@ class BHP_PanelContainer extends PluginPanel
         revalidate();
     }
 
-    public BHP_NotesPanel getNotesPanel()
-    {
-        return notesPanel;
-    }
+    public BHP_NotesPanel getNotesPanel(){ return notesPanel;}
 
-    public BHP_HistoryPanel getHistoryPanel(){ return historyPanel; }
+    public BHP_HistoryPanel getHistoryPanel(){ return historyPanel;}
 
 }

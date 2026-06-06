@@ -60,6 +60,7 @@ public class BHP_NotesPanel extends JPanel
     private final JLabel surgeDash;
     private final JLabel surgeNo;
     private final JLabel surgeYes;
+    private final JLabel surgeYesBoost;
     private final JPanel minigamePanel;
     private final JPanel bosskcPanel;
 
@@ -298,6 +299,16 @@ public class BHP_NotesPanel extends JPanel
         c.gridy = 5;
         add(surgeYes, c);
 
+        surgeYesBoost = new JLabel("Yes (with boost)", JLabel.CENTER);
+        surgeYesBoost.setForeground(Color.green);
+        surgeYesBoost.setVisible(false);
+        c.weightx = 1;
+        c.gridwidth = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 1;
+        c.gridy = 5;
+        add(surgeYesBoost, c);
+
         //panel to display LMS, BH Rouge (nontarget) & BH Hunter (target)
         minigamePanel = new JPanel();
         minigamePanel.setLayout(new GridLayout(0, 3));
@@ -464,16 +475,26 @@ public class BHP_NotesPanel extends JPanel
                 final boolean isSkill = skill.getType() == HiscoreSkillType.SKILL;
                 int level = -1;
 
-                if(result.getSkill(HERBLORE).getLevel() >= 81)
+                int herbLevel = result.getSkill(HERBLORE).getLevel();
+
+                surgeDash.setVisible(false);
+
+                if(herbLevel >= 81)
                 {
-                    surgeDash.setVisible(false);
                     surgeNo.setVisible(false);
+                    surgeYesBoost.setVisible(false);
                     surgeYes.setVisible(true);
+                }
+                else if(herbLevel >= 77)
+                {
+                    surgeNo.setVisible(false);
+                    surgeYes.setVisible(false);
+                    surgeYesBoost.setVisible(true);
                 }
                 else
                 {
-                    surgeDash.setVisible(false);
                     surgeYes.setVisible(false);
+                    surgeYesBoost.setVisible(false);
                     surgeNo.setVisible(true);
                 }
 
@@ -766,5 +787,4 @@ public class BHP_NotesPanel extends JPanel
             bosskcPanel.setVisible(false);
         }
     }
-
 }
