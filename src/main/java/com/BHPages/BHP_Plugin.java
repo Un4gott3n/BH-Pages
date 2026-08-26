@@ -11,9 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import net.runelite.api.Client;
 import net.runelite.api.MenuAction;
+import net.runelite.api.MenuEntry;
 import net.runelite.api.Player;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.MenuEntryAdded;
+import net.runelite.api.events.MenuOpened;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.WidgetUtil;
@@ -34,6 +36,8 @@ import net.runelite.client.util.Text;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,6 +54,9 @@ import static net.runelite.api.ChatMessageType.GAMEMESSAGE;
 public class BHP_Plugin extends Plugin {
 
 	private static final String LOOKUP = "BH Lookup";
+
+	//temp list for right-click menu name preservation, thx again HiScores :)
+	private final Map<Integer,String> playernameIndex = new HashMap<>();
 
 	@Inject
 	private Client client;
@@ -74,13 +81,8 @@ public class BHP_Plugin extends Plugin {
 	private BHP_PanelContainer BHPPanelContainer;
 	private BHP_HistoryPanel BHPHistoryPanel;
 
-	//regex for opponent player name extraction (onChatMessage)
-	private static final Pattern BOUNTY_PATTERN = Pattern.compile("You have been assigned a new target: <col=[0-9a-f]+>(.*)</col>");
-
-	//Openmessage + name + Closemessage
-	//Regex matcher for command in chat
-	private final String gamemessagePlayerOpenString = "You have been assigned a new target: <col=e00a19>";
-	private final String getGamemessagePlayerCloseString = "</col>";
+	//regex for opponent player name extraction (onChatMessage). 26/08 - changed from <col=> to @mes_hl_red@
+	private static final Pattern BOUNTY_PATTERN = Pattern.compile("You have been assigned a new target: @mes_hl_red@(.*)</col>");
 
 	@Provides
 	BHP_Config provideConfig(ConfigManager configManager)
@@ -123,6 +125,7 @@ public class BHP_Plugin extends Plugin {
 		sessionHandler.saveNotes();
 		BHPNotesPanel.shutdown();
 		clientToolbar.removeNavigation(navButton);
+		playernameIndex.clear();
 		menuManager.get().removePlayerMenuItem(LOOKUP);
 
 	}
@@ -148,6 +151,27 @@ public class BHP_Plugin extends Plugin {
 			{
 				BHPNotesPanel.showBossPanel(false);
 			}
+		}
+	}
+
+	@Subscribe
+	private void onMenuOpened(MenuOpened event)
+	{
+		playernameIndex.clear();
+		for (MenuEntry entry : event.getMenuEntries())
+		{
+			if (entry.getType() != MenuAction.RUNELITE_PLAYER || !entry.getOption().equals(LOOKUP))
+			{
+				continue;
+			}
+
+			final Player player = entry.getPlayer();
+			if (player == null)
+			{
+				continue;
+			}
+
+			playernameIndex.put(entry.getIdentifier(), player.getName());
 		}
 	}
 
@@ -197,12 +221,16 @@ public class BHP_Plugin extends Plugin {
 		if (event.getMenuAction() == MenuAction.RUNELITE_PLAYER && event.getMenuOption().equals(LOOKUP))
 		{
 			Player player = event.getMenuEntry().getPlayer();
-			if (player == null)
+			final String target;
+			if (player != null)
 			{
-				return;
+				target = player.getName();
 			}
-
-			String target = player.getName();
+			else
+			{
+				target = playernameIndex.get(event.getId());
+			}
+			playernameIndex.clear();
 			
 			lookupPlayerName(target, ""); //blank datetime to ensure history is NOT added.
 		}

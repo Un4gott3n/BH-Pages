@@ -12,6 +12,7 @@ import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Experience;
+import net.runelite.api.Player;
 import net.runelite.client.game.SpriteManager;
 import net.runelite.client.hiscore.*;
 
@@ -25,9 +26,7 @@ import net.runelite.client.ui.components.IconTextField;
 import net.runelite.client.util.ImageUtil;
 
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.List;
@@ -153,6 +152,24 @@ public class BHP_NotesPanel extends JPanel
         {
             String searchName = opp_nameText.getText();
             lookup(searchName);
+        });
+        opp_nameText.addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                if(e.getClickCount() != 2)
+                {
+                    return;
+                }
+
+                Player localPlayer = client.getLocalPlayer();
+
+                if(localPlayer != null)
+                {
+                    lookup(localPlayer.getName());
+                }
+            }
         });
         opp_nameText.addClearListener(() ->
         {

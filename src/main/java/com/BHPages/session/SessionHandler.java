@@ -10,6 +10,8 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Collections;
+import java.util.Set;
 
 public class SessionHandler
 {
@@ -104,9 +106,16 @@ public class SessionHandler
         }
     }
 
+    //is it a good idea to provide this without read-only? its the entire database.
     public Map<String, String> getAllNotes()
     {
         return new HashMap<>(playerNotes);
+    }
+
+    //read only version, just names, no notes
+    public Set<String> getSavedPlayerNames()
+    {
+        return Collections.unmodifiableSet(playerNotes.keySet());
     }
 
     public String getNoteForPlayer(String playerName)

@@ -26,6 +26,7 @@
 //thanks & credits to hiscores plugin!
 package com.BHPages;
 
+import com.BHPages.session.SessionHandler;
 import com.google.common.collect.EvictingQueue;
 import com.google.inject.Inject;
 import java.awt.event.KeyEvent;
@@ -70,6 +71,7 @@ class NameAutocompleter implements KeyListener
 
     private final Client client;
     private final BHP_Config BHPconfig;
+    private final SessionHandler sessionHandler;
 
     private final EvictingQueue<String> searchHistory = EvictingQueue.create(MAX_SEARCH_HISTORY);
 
@@ -84,10 +86,11 @@ class NameAutocompleter implements KeyListener
     private Pattern autocompleteNamePattern;
 
     @Inject
-    private NameAutocompleter(Client client, BHP_Config config)
+    private NameAutocompleter(Client client, BHP_Config config, SessionHandler sessionHandler)
     {
         this.client = client;
         this.BHPconfig = config;
+        this.sessionHandler = sessionHandler;
     }
 
     @Override
@@ -247,6 +250,15 @@ class NameAutocompleter implements KeyListener
                     .filter(Objects::nonNull)
                     .flatMap(cs -> cs.getMembers().stream())
                     .map(ClanMember::getName)
+                    .filter(n -> pattern.matcher(n).matches())
+                    .findFirst();
+        }
+
+        //search players saved in BH Pages notes database key pairs
+        if(!autocompleteName.isPresent())
+        {
+            autocompleteName = sessionHandler.getSavedPlayerNames().stream()
+                    .filter(Objects::nonNull)
                     .filter(n -> pattern.matcher(n).matches())
                     .findFirst();
         }

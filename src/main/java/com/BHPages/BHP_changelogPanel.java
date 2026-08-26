@@ -53,6 +53,10 @@ public class BHP_changelogPanel extends JPanel
                         "<li><font color='orange'>Fixed:</font> Issue where the history tab wont scroll.</li>" +
                         "<li><font color='orange'>Fixed:</font> Issue where herblore boost wasn't accounted for in Surge Pot checks.</li>" +
                         "<li><font color='orange'>Fixed:</font> Issue where boss KC panel doesn't show on client restart when enabled.</li>" +
+                        "<li><font color='green'>Added:</font> Double click search icon (magnifying glass) to search self.</li>" +
+                        "<li><font color='orange'>Fixed:</font> Right-click lookup not working when player offscreen / out of distance.</li>" +
+                        "<li><font color='green'>Added:</font> Autocorrect now indexes saved players.</li>" +
+                        "<li><font color='orange'>Fixed:</font> Being assigned a target doesn't trigger auto-open due to in-game message format change.</li>" +
                         "</ul>" +
                         "</body>" +
                         "</html>";
