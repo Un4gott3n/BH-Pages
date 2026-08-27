@@ -13,12 +13,17 @@ import java.util.Map;
 import java.util.Collections;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class SessionHandler
 {
     private static final String FILE_NAME = "player_notes.json";
     private final File notesFile;
     private final Gson gson;
     private Map<String, String> playerNotes = new HashMap<>();
+
+    private static final Logger log = LoggerFactory.getLogger(SessionHandler.class);
 
     @Inject
     public SessionHandler(Gson gson)
@@ -89,7 +94,7 @@ public class SessionHandler
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            log.error("failed to load BH-Pages database data..", e);
         }
     }
 
@@ -102,7 +107,7 @@ public class SessionHandler
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            log.error("failed to save BH-Pages database data..", e);
         }
     }
 
